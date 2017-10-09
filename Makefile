@@ -1,7 +1,8 @@
 CXX= g++
-LIBS=  -pthread -std=c++11
+LIBS= -pthread -std=c++11
 OUTPUT= primer
+DEBUG=
 
 all:
-	$(CXX) $(LIBS) main.cpp -o $(OUTPUT)
+	$(CXX) $(DEBUG) $(LIBS) main.cpp -o $(OUTPUT)
 
