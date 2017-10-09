@@ -42,8 +42,7 @@ void next_prime() {
 int main(int argc, char *argv[]) {
     std::vector<std::string> arguments(argv + 1, argv + argc);
     args.insert(args.end(), arguments.begin(), arguments.end());
-    int max = std::stoi(args[0]);
-    if (args.size() == 0 || max < 2) return 1;
+    if (args.size() == 0 || std::stoi(args[0]) < 2) return 1;
 
     // 1:37 bodge
     std::cout << 2 << "\n";
