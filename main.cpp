@@ -22,6 +22,7 @@ bool is_prime(int p) {
     return true;
 }
 
+
 void next_prime() {
     int cp = 0;
     static int max = std::stoi(args[0]);
@@ -41,8 +42,11 @@ void next_prime() {
 int main(int argc, char *argv[]) {
     std::vector<std::string> arguments(argv + 1, argv + argc);
     args.insert(args.end(), arguments.begin(), arguments.end());
-    if (args.size() == 0) return 1;
+    int max = std::stoi(args[0]);
+    if (args.size() == 0 || max < 2) return 1;
 
+    // 1:37 bodge
+    std::cout << 2 << "\n";
     for (int i = 0; i < concurrency; i++) threads.push_back(new std::thread(next_prime));
 
     for (std::thread *t : threads) t->join();
