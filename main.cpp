@@ -5,6 +5,8 @@
 #include <thread>
 #include <vector>
 
+int max = 0;
+
 std::vector<std::string> args;
 std::vector<std::thread *> threads;
 int concurrency = std::thread::hardware_concurrency();
@@ -12,8 +14,9 @@ int concurrency = std::thread::hardware_concurrency();
 std::mutex num_mutex;
 std::mutex out_mutex;
 int current_number = 1;
+int inc = 2;
 
-bool is_prime(int p) {
+bool simple(int p) {
     if (p <= 1) return false;
     if (p <= 3) return true;
     if (p % 2 == 0 || p % 3 == 0) return false;
@@ -22,13 +25,13 @@ bool is_prime(int p) {
     return true;
 }
 
+auto is_prime = simple;
 
 void next_prime() {
     int cp = 0;
-    static int max = std::stoi(args[0]);
     do {
         num_mutex.lock();
-        cp = (current_number += 2);
+        cp = (current_number += inc);
         num_mutex.unlock();
         if (cp > max) return;
         if (is_prime(cp)) {
@@ -42,7 +45,11 @@ void next_prime() {
 int main(int argc, char *argv[]) {
     std::vector<std::string> arguments(argv + 1, argv + argc);
     args.insert(args.end(), arguments.begin(), arguments.end());
-    if (args.size() == 0 || std::stoi(args[0]) < 2) return 1;
+    if (args.size() == 0 || (max = std::stoi(args[0])) < 2) return 1;
+
+    /*
+     * TODO: check args[2] for algorithm
+     */
 
     // 1:37 bodge
     std::cout << 2 << "\n";
