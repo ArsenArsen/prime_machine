@@ -72,7 +72,7 @@ namespace primer                                                                
             if (cp > max) break                                                                                                     ;
             if (sieve_map[cp]) continue                                                                                             ;
 
-            for (int i = cpsq; i < max; i += cp)                                                                           {
+            for (int i = cpsq; i < max; i += cp)                                                                                    {
                 sieve_mutex.lock()                                                                                                  ;
                 sieve_map[i] = true                                                                                                 ;
                 sieve_mutex.unlock()                                                                                                ;}}
@@ -98,8 +98,8 @@ int main(int argc, char *argv[])                                                
 
     for (std::thread *t : threads) t->join()                                                                                        ;
     if (args.size() > 1 && args[1] == "sieve") for (int i = 0; i < max; i++) if (!sieve_map[i]) std::cout << i + 1 << "\n"          ;
-    while (!primer::log.empty())                                                                                                            {
-        std::cout << primer::log.top() << "\n"                                                                                              ;
-        primer::log.pop()                                                                                                                   ;}
+    while (!primer::log.empty())                                                                                                    {
+        std::cout << primer::log.top() << "\n"                                                                                      ;
+        primer::log.pop()                                                                                                           ;}
 
     return 0                                                                                                                        ;}
