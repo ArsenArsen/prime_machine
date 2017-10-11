@@ -1,6 +1,8 @@
 #include <iostream>
 #include <limits>
+#include <algorithm>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <thread>
 #include <vector>
@@ -13,6 +15,8 @@ int concurrency = std::thread::hardware_concurrency();
 
 std::mutex num_mutex;
 std::mutex out_mutex;
+std::priority_queue<int> log;
+
 int current_number = 1;
 int inc = 2;
 
@@ -27,6 +31,18 @@ bool simple(int p) {
 
 auto is_prime = simple;
 
+int last_biggest = 0;
+
+void non_sorted(int cp) {
+    std::cout << cp << "\n";
+}
+
+void sorted(int cp) {
+    log.push(cp);
+}
+
+auto output = non_sorted;
+
 void next_prime() {
     int cp = 0;
     do {
@@ -36,7 +52,7 @@ void next_prime() {
         if (cp > max) return;
         if (is_prime(cp)) {
             out_mutex.lock();
-            std::cout << cp << "\n";
+            log.push(cp);
             out_mutex.unlock();
         }
     } while (cp < max);
@@ -47,6 +63,8 @@ int main(int argc, char *argv[]) {
     args.insert(args.end(), arguments.begin(), arguments.end());
     if (args.size() == 0 || (max = std::stoi(args[0])) < 2) return 1;
 
+    if (std::count(args.begin(), args.end(), std::string("--sort")) > 0) output = sorted;
+
     /*
      * TODO: check args[2] for algorithm
      */
@@ -56,6 +74,10 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < concurrency; i++) threads.push_back(new std::thread(next_prime));
 
     for (std::thread *t : threads) t->join();
+    while (!log.empty()) {
+        std::cout << log.top() << "\n";
+        log.pop();
+    }
 
     return 0;
 }
