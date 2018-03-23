@@ -1,2 +1,4 @@
 primer
 log*
+*.out
+tags
