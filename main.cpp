@@ -8,6 +8,7 @@
 #include <mutex>
 #include <new>
 #include <string>
+#include <sys/mman.h>
 #include <thread>
 #include <vector>
 
@@ -22,7 +23,7 @@ namespace primer {
             for (uint64_t j = 0;; j++) {
                 uint64_t current = i2 + j * i;
                 if (current >= max) break;
-                sieve[current] = true;
+                sieve[current].store(true, std::memory_order_relaxed);
             }
         }
     }
@@ -33,8 +34,12 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> args(argv + 1, argv + argc);
     if (args.size() == 0 || (primer::max = std::stoull(args[0])) < 2) return 1;
 
-    primer::sieve = new std::atomic_bool[primer::max];
-    std::fill_n(primer::sieve, primer::max, false);
+    primer::sieve
+    = static_cast<std::atomic_bool *>(mmap(NULL, primer::max, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0));
+    if (ptrdiff_t(primer::sieve) == ptrdiff_t(-1)) {
+        perror("mmap");
+        return 1;
+    }
     uint64_t maximum = uint64_t(floor(sqrt(primer::max)));
 
     std::vector<std::thread *> threads;
@@ -43,7 +48,7 @@ int main(int argc, char *argv[]) {
     for (std::thread *t : threads) t->join();
 
     for (uint64_t i = 2; i < primer::max; i++) {
-        if (!primer::sieve[i]) std::cout << i << '\n';
+        if (!primer::sieve[i].load(std::memory_order_relaxed)) std::cout << i << '\n';
     }
 
     return 0;
