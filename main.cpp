@@ -42,10 +42,10 @@ int main(int argc, char *argv[]) {
     }
     uint64_t maximum = uint64_t(floor(sqrt(primer::max)));
 
-    std::vector<std::thread *> threads;
+    std::vector<std::thread> threads;
     for (unsigned i = 0; i < primer::concurrency; i++)
-        threads.push_back(new std::thread(primer::runner, i + 2, maximum));
-    for (std::thread *t : threads) t->join();
+        threads.emplace_back(primer::runner, i + 2, maximum);
+    for (std::thread &t : threads) t.join();
 
     for (uint64_t i = 2; i < primer::max; i++) {
         if (!primer::sieve[i].load(std::memory_order_relaxed)) std::cout << i << '\n';
